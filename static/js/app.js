@@ -5,7 +5,6 @@ d3.json("/data/samples.json").then(function(samples) {
     console.log(samples); 
     var sampleIDs = samples.samples.map(person => person.id); 
     var otuIDs = samples.samples.map(person => person.otu_ids); 
-    console.log(otuIDs); 
 
     for (var i = 0; i < sampleIDs.length; i++) {
         d3.select("#selDataset").append("option").text(sampleIDs[i])
@@ -34,6 +33,9 @@ d3.json("/data/samples.json").then(function(samples) {
                 summaryTable.append('p').append('strong').text(`wfreq: ${sampleMetadata[i].wfreq}`);
             }
         }
+
+        var sampleData = samples.samples.map(person => person);
+        console.log(sampleData[0].otu_ids, sampleData[0].sample_values)
 
         
     }
