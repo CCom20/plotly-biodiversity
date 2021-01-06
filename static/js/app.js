@@ -57,6 +57,7 @@ d3.json("/data/samples.json").then(function(samples) {
 
         // Define the plot layout
         var layout = {
+            title: `Subject ${sampleSelection} Top Ten OTU Counts`, 
             xaxis: {
                 showticklabels: true,
                 tickmode: 'auto'
