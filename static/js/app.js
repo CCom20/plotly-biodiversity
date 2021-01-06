@@ -2,7 +2,7 @@
 
 // Go through JSON Data
 d3.json("/data/samples.json").then(function(samples) {
-    console.log(samples); 
+    // console.log(samples); 
     var sampleIDs = samples.samples.map(person => person.id); 
     var otuIDs = samples.samples.map(person => person.otu_ids); 
 
@@ -19,7 +19,10 @@ d3.json("/data/samples.json").then(function(samples) {
 
         var sampleSelection = d3.select("#selDataset").property("value");
         
-        var sampleMetadata = samples.metadata.map(person => person)
+        var sampleMetadata = samples.metadata.map(person => person);
+
+        var sampleData = samples.samples.map(data => data)
+        console.log(sampleData);
 
         for (var i = 0; i < sampleIDs.length; i++) {
 
@@ -31,11 +34,35 @@ d3.json("/data/samples.json").then(function(samples) {
                 summaryTable.append('p').append('strong').text(`Location: ${sampleMetadata[i].location}`);
                 summaryTable.append('p').append('strong').text(`BB Type: ${sampleMetadata[i].bbtype}`);
                 summaryTable.append('p').append('strong').text(`wfreq: ${sampleMetadata[i].wfreq}`);
+
+                console.log(sampleData[i].id); 
+
+                var trace1 = {
+                    x: sampleData[i].otu_ids,
+                    y: sampleData[i].sample_values,
+                    type: 'bar'
+                }
             }
         }
 
-        var sampleData = samples.samples.map(person => person);
-        console.log(sampleData[0].otu_ids, sampleData[0].sample_values)
+        // var trace1 = {
+        //     x: sampleData.sample_values, 
+        //     y: sampleData.otu_ids,
+        //     type: 'bar'
+        // }
+
+        // Create the data array for the plot
+        var data = [trace1];
+
+        // Define the plot layout
+        var layout = {
+        title: "Square Root of Cancer Survival by Organ",
+        xaxis: { title: "OTU ID" },
+        yaxis: { title: "Count" }
+        };
+
+        // Plot the chart to a div tag with id "plot"
+        Plotly.newPlot("bar", data, layout);
 
         
     }
