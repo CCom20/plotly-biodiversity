@@ -5,8 +5,6 @@ d3.json("/data/samples.json").then(function(samples) {
     var allSampleData = samples.samples.map(person => person);
     
     var sampleMetadata = samples.metadata.map(item => item); 
-    console.log(allSampleData);
-    console.log(sampleMetadata);
 
     for (var i = 0; i < allSampleData.length; i++) {
         d3.select("#selDataset").append("option").text(allSampleData[i].id)
@@ -39,24 +37,52 @@ d3.json("/data/samples.json").then(function(samples) {
                 var sampleOTUids = allSampleData[i].otu_ids.slice(0, 10);
                 var reversedOTUs = sampleOTUids.reverse();
                 
-                var otuLabels = []; 
+                var otuLabels = [];
+                
+                var hoverOTUlables = [];
+
+                allSampleData[i].otu_labels.forEach((name) => hoverOTUlables.push(name))
 
                 reversedOTUs.forEach((label) => otuLabels.push(`OTU ${label}`)) 
 
-                var trace1 = {
+                var barTrace = {
                     type: 'bar',
                     x: sampleValues,
                     y: otuLabels,
-                    orientation: 'h'
+                    orientation: 'h',
+                    opacity: 0.5,
+                    text: hoverOTUlables, 
+                    marker: {
+                        line: {
+                            color: 'rgb(8,48,107)',
+                            width: 1.5 
+                        }
+                    }
                   };
+
+                var bubbleTrace = {
+
+                    x: allSampleData[i].otu_ids,
+                    y: allSampleData[i].sample_values,
+                    text: allSampleData[i].otu_labels,
+                    mode: 'markers',
+                    marker: {
+                      size: allSampleData[i].sample_values,
+                      color: sampleOTUids,
+                      opacity: 0.75, 
+                      sizeref: 0.5,
+                      sizemode: 'area'
+                    }
+                  };
+
             }
         }
 
         // Create the data array for the plot
-        var data = [trace1]; 
+        var barData = [barTrace]; 
 
         // Define the plot layout
-        var layout = {
+        var barLayout = {
             title: `Subject ${sampleSelection} Top Ten OTU Counts`, 
             xaxis: {
                 showticklabels: true,
@@ -65,9 +91,24 @@ d3.json("/data/samples.json").then(function(samples) {
         }
 
         // Plot the chart to a div tag with id "plot"
-        Plotly.newPlot("bar", data, layout);
+        Plotly.newPlot("bar", barData, barLayout);
 
-        
+        // Create the data array for the plot
+        var bubbleData = [bubbleTrace]; 
+
+        // Define the plot layout
+        var bubbleLayout = {
+            title: 'Bubble Chart Size Scaling',
+            showlegend: false,
+            height: 500,
+            width: 900
+          };
+          
+        Plotly.newPlot('bubble', bubbleData, bubbleLayout);
+
+        // Plot the chart to a div tag with id "plot"
+        Plotly.newPlot("bar", barData, barLayout);
+
     }
 
     d3.select("#selDataset").on("change", buildDashboard); 
