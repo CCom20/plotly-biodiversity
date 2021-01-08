@@ -3,35 +3,28 @@
 d3.json("/data/samples.json").then(function(samples) {
     // console.log(samples); 
     var allSampleData = samples.samples.map(person => person);
-    
     var sampleMetadata = samples.metadata.map(item => item); 
 
     for (var i = 0; i < allSampleData.length; i++) {
         d3.select("#selDataset").append("option").text(allSampleData[i].id)
     }
 
+    d3.select("#selDataset").on("change", buildDashboard);
+    d3.select("#selDataset").on("change", buildDemographics); 
+
+
     buildDashboard();
+
+    buildDemographics(); 
 
     function buildDashboard() {
 
-        var summaryTable = d3.select(".panel-body")
-        summaryTable.html("")
-
         var sampleSelection = d3.select("#selDataset").property("value");
-        
-        var sampleMetadata = samples.metadata.map(person => person);
 
         for (var i = 0; i < allSampleData.length; i++) {
 
             if (sampleSelection === allSampleData[i].id) {
-                summaryTable.append("p").append('strong').text(`ID: ${sampleSelection}`);
-                summaryTable.append('p').append('strong').text(`Ethnicity: ${sampleMetadata[i].ethnicity}`);
-                summaryTable.append('p').append('strong').text(`Gender: ${sampleMetadata[i].gender}`);
-                summaryTable.append('p').append('strong').text(`Age: ${sampleMetadata[i].age}`);
-                summaryTable.append('p').append('strong').text(`Location: ${sampleMetadata[i].location}`);
-                summaryTable.append('p').append('strong').text(`BB Type: ${sampleMetadata[i].bbtype}`);
-                summaryTable.append('p').append('strong').text(`wfreq: ${sampleMetadata[i].wfreq}`); 
-                
+                               
                 var sampleValues = allSampleData[i].sample_values.slice(0, 10);
                 var reversedSampleValues = sampleValues.reverse(); 
                 var sampleOTUids = allSampleData[i].otu_ids.slice(0, 10);
@@ -78,6 +71,7 @@ d3.json("/data/samples.json").then(function(samples) {
             }
         }
 
+
         // Create the data array for the plot
         var barData = [barTrace]; 
 
@@ -111,6 +105,26 @@ d3.json("/data/samples.json").then(function(samples) {
 
     }
 
-    d3.select("#selDataset").on("change", buildDashboard); 
+    function buildDemographics() {
+        var sampleSelection = d3.select("#selDataset").property("value");
+        var summaryTable = d3.select(".panel-body")
+        
+        summaryTable.html("")
+    
+        sampleMetadata.forEach((subject) => { 
+
+            if (subject.id == sampleSelection) {
+
+                console.log(subject.id, sampleSelection)
+                summaryTable.append("p").append('strong').text(`ID: ${subject.id}`);
+                summaryTable.append('p').append('strong').text(`Ethnicity: ${subject.ethnicity}`);
+                summaryTable.append('p').append('strong').text(`Gender: ${subject.gender}`);
+                summaryTable.append('p').append('strong').text(`Age: ${subject.age}`);
+                summaryTable.append('p').append('strong').text(`Location: ${subject.location}`);
+                summaryTable.append('p').append('strong').text(`BB Type: ${subject.bbtype}`);
+                summaryTable.append('p').append('strong').text(`wfreq: ${subject.wfreq}`);
+            }
+        }); 
+    }; 
 
 });
