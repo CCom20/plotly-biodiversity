@@ -1,44 +1,51 @@
 
-// Go through JSON Data
+// FETCH JSON
 d3.json("/data/samples.json").then(function(samples) {
 
+    // GET ALL SAMPLE DATA AND METADATA
     var allSampleData = samples.samples.map(person => person);
     var sampleMetadata = samples.metadata.map(item => item); 
 
-    for (var i = 0; i < allSampleData.length; i++) {
-        d3.select("#selDataset").append("option").text(allSampleData[i].id)
-    }
+    // SAMPLE SELECTIONS - APPEND IDS AS OPTIONS
+    allSampleData.forEach((selection) => d3.select("#selDataset").append("option").text(selection.id))
 
+    // EVENT - CHANGE CHARTS AND DEMOGRAPHICS TABLE
     d3.select("#selDataset").on("change", buildDashboard);
     d3.select("#selDataset").on("change", buildDemographics); 
 
-
+    // INITIALIZE DASHBOARD AND DEMOGRAPHICS TABLE
     buildDashboard();
+    buildDemographics();
 
-    buildDemographics(); 
-
+    // BUILD DASHBOARD
     function buildDashboard() {
 
+        // GET SAMPLE SELECTION VALUE
         var sampleSelection = d3.select("#selDataset").property("value");
 
+        // LOOP THROUGH ALL SAMPLE DATA
         allSampleData.forEach((subject) => {
 
+            // IF STATEMENT : CHECK FOR ID THAT MATCHES SAMPLE SELECTION, CONTINUE
             if (subject.id === sampleSelection) {
 
+                // GET FIRST TEN SAMPLE VALUES AND REVERSE THEIR ORDER - BAR CHART
                 var sampleValues = subject.sample_values.slice(0, 10);
-
                 var reversedSampleValues = sampleValues.reverse();
 
+                // GET FIRST TEN SAMPLE OTU IDS AND REVERSE THEIR ORDER - BAR CHART
                 var sampleOTUids = subject.otu_ids.slice(0, 10);
                 var reversedSamples = sampleOTUids.reverse(); 
 
+                // CREATE EMPTY ARRAYS FOR OTU LABELS AND HOVER INFO - BAR CHART
                 var otuLabels = [];
-
                 var hoverOTUlables = [];
 
+                // PUSH OTU LABELS AND IDS AS STRINGS TO POPULATE Y-AXIS
                 subject.otu_labels.forEach((name) => hoverOTUlables.push(name))
                 reversedSamples.forEach((label) => otuLabels.push(`OTU ${label}`))
 
+                // BAR CHART TRACE
                 var barTrace = {
                     type: 'bar',
                     x: reversedSampleValues,
@@ -54,6 +61,7 @@ d3.json("/data/samples.json").then(function(samples) {
                     }
                 };
 
+                // BUBBLE CHART TRACE
                 var bubbleTrace = {
 
                     x: subject.otu_ids,
@@ -69,10 +77,8 @@ d3.json("/data/samples.json").then(function(samples) {
                     }
                 };
 
-                // Create the data array for the plot
+                // BAR CHART DATA AND LAYOUT
                 var barData = [barTrace]; 
-
-                // Define the plot layout
                 var barLayout = {
                     title: `Subject ${sampleSelection} Top Ten OTU Counts`, 
                     xaxis: {
@@ -81,13 +87,11 @@ d3.json("/data/samples.json").then(function(samples) {
                     }
                 }
 
-                // Plot the chart to a div tag with id "plot"
+                // PLOT BAR CHART
                 Plotly.newPlot("bar", barData, barLayout);
 
-                // Create the data array for the plot
+                // BUBBLE CHART DATA AND LAYOUT
                 var bubbleData = [bubbleTrace]; 
-
-                // Define the plot layout
                 var bubbleLayout = {
                     title: `Subject ${subject.id} Culture Counts by OTU ID`,
                     showlegend: false,
@@ -95,10 +99,8 @@ d3.json("/data/samples.json").then(function(samples) {
                     width: 900
                 };
                 
+                // PLOT BUBBLE CHART
                 Plotly.newPlot('bubble', bubbleData, bubbleLayout);
-
-                // Plot the chart to a div tag with id "plot"
-                Plotly.newPlot("bar", barData, barLayout);
 
             }
 
@@ -106,14 +108,20 @@ d3.json("/data/samples.json").then(function(samples) {
 
     }
 
+    // BUILD DEMOGRAPHICS TABLE 
     function buildDemographics() {
+
+        // SET VARIABLES FOR SAMPLE SELECTION AND SUMMARY TABLE
         var sampleSelection = d3.select("#selDataset").property("value");
         var summaryTable = d3.select(".panel-body")
         
+        // CLEAR TABLE HTML
         summaryTable.html("")
 
+        // CALL TO REBUILD DASHBOARD
         buildDashboard();
-    
+
+        // LOOP THROUGH METADATA AND APPEND INFORMATION TO DEMOGRAPHICS TABLE
         sampleMetadata.forEach((subject) => { 
 
             if (subject.id == sampleSelection) {
@@ -128,5 +136,4 @@ d3.json("/data/samples.json").then(function(samples) {
             }
         }); 
     }; 
-
 });
