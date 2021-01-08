@@ -1,9 +1,8 @@
 
 // Go through JSON Data
 d3.json("/data/samples.json").then(function(samples) {
-    // console.log(samples); 
+
     var allSampleData = samples.samples.map(person => person);
-    console.log(allSampleData);
     var sampleMetadata = samples.metadata.map(item => item); 
 
     for (var i = 0; i < allSampleData.length; i++) {
@@ -26,22 +25,23 @@ d3.json("/data/samples.json").then(function(samples) {
 
             if (subject.id === sampleSelection) {
 
-                console.log(subject.id, sampleSelection)
-
                 var sampleValues = subject.sample_values.slice(0, 10);
+
+                var reversedSampleValues = sampleValues.reverse();
+
                 var sampleOTUids = subject.otu_ids.slice(0, 10);
-                var reversedOTUs = sampleOTUids.reverse();
+                var reversedSamples = sampleOTUids.reverse(); 
 
                 var otuLabels = [];
 
                 var hoverOTUlables = [];
 
                 subject.otu_labels.forEach((name) => hoverOTUlables.push(name))
-                reversedOTUs.forEach((label) => otuLabels.push(`OTU ${label}`))
+                reversedSamples.forEach((label) => otuLabels.push(`OTU ${label}`))
 
                 var barTrace = {
                     type: 'bar',
-                    x: sampleValues,
+                    x: reversedSampleValues,
                     y: otuLabels,
                     orientation: 'h',
                     opacity: 0.5,
@@ -89,7 +89,7 @@ d3.json("/data/samples.json").then(function(samples) {
 
                 // Define the plot layout
                 var bubbleLayout = {
-                    title: 'Bubble Chart Size Scaling',
+                    title: `Subject ${subject.id} Culture Counts by OTU ID`,
                     showlegend: false,
                     height: 500,
                     width: 900
@@ -111,6 +111,8 @@ d3.json("/data/samples.json").then(function(samples) {
         var summaryTable = d3.select(".panel-body")
         
         summaryTable.html("")
+
+        buildDashboard();
     
         sampleMetadata.forEach((subject) => { 
 
