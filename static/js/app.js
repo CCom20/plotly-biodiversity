@@ -6,6 +6,7 @@ d3.json("/data/samples.json").then(function(samples) {
     
     var sampleMetadata = samples.metadata.map(item => item); 
     console.log(allSampleData);
+    console.log(sampleMetadata);
 
     for (var i = 0; i < allSampleData.length; i++) {
         d3.select("#selDataset").append("option").text(allSampleData[i].id)
@@ -37,7 +38,6 @@ d3.json("/data/samples.json").then(function(samples) {
                 var reversedSampleValues = sampleValues.reverse(); 
                 var sampleOTUids = allSampleData[i].otu_ids.slice(0, 10);
                 var reversedOTUs = sampleOTUids.reverse();
-                var reverseOTUsString = reversedOTUs.toString();
                 
                 var otuLabels = []; 
 
