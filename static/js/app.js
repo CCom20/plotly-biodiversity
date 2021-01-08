@@ -1,6 +1,6 @@
 
 // FETCH JSON
-d3.json("/data/samples.json").then(function(samples) {
+d3.json("data/samples.json").then(function(samples) {
 
     // GET ALL SAMPLE DATA AND METADATA
     var allSampleData = samples.samples.map(person => person);
